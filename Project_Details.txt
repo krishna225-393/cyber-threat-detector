@@ -1,0 +1,11 @@
+Additional Features in app.py
+----------------------------
+1. User Behavior Analytics (UBA):
+   - `detect_user_behavior_anomalies` tracks login frequency and timing.
+   - Flags anomalies (e.g., double login count or 5-min deviation) and blocks IPs.
+2. Incident Reporting Dashboard:
+   - `/incidents` route displays all logged threats from alerts.txt.
+   - Enables post-mortem analysis (e.g., http://127.0.0.1:5000/incidents).
+3. Deception Technology (Honeypot):
+   - `detect_honeypot_activity` monitors decoy IP (192.168.1.999).
+   - Alerts if accessed, indicating potential attackers.

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Firewall Rules</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1 { color: #1b5e91; }
+        ul { list-style-type: none; padding: 0; }
+        li { background: #e9ecef; padding: 10px; margin: 5px 0; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Blocked IPs (Firewall Rules)</h1>
+    {% if rules %}
+        <ul>
+        {% for rule in rules %}
+            <li>{{ rule }}</li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>No IPs blocked yet.</p>
+    {% endif %}
+    <a href="/">Back to Dashboard</a>
+</body>
+</html>
