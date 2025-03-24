@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyber Threat Detector - Command Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto+Mono:wght@300;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #0a1433;
+            --secondary-color: #00e6ff;
+            --card-bg: rgba(255, 255, 255, 0.98);
+            --text-color: #1a2b66;
+            --border-color: #b3c6ff;
+            --glow-color: rgba(0, 230, 255, 0.4);
+            --shadow-color: rgba(0, 0, 0, 0.4);
+        }
+
+        body {
+            font-family: 'Roboto Mono', monospace;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(145deg, #0a1433 0%, #1a2b66 100%);
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .bg-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(0, 230, 255, 0.05) 0%, transparent 70%);
+            z-index: 0;
+            animation: pulse 15s infinite;
+        }
+
+        .sidebar {
+            width: 300px;
+            background: var(--card-bg);
+            padding: 40px 25px;
+            box-shadow: 5px 0 30px var(--shadow-color);
+            position: fixed;
+            height: 100%;
+            transition: transform 0.4s ease;
+            z-index: 1000;
+            border-right: 2px solid var(--secondary-color);
+        }
+
+        .sidebar.collapsed {
+            transform: translateX(-300px);
+        }
+
+        .sidebar h3 {
+            color: var(--primary-color);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 50px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px var(--glow-color);
+        }
+
+        .sidebar a {
+            display: flex;
+            align-items: center;
+            color: var(--text-color);
+            text-decoration: none;
+            padding: 15px 20px;
+            margin: 10px 0;
+            border-radius: 10px;
+            font-weight: 500;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.4s ease;
+        }
+
+        .sidebar a:hover, .sidebar a.active {
+            background: var(--secondary-color);
+            color: var(--primary-color);
+            box-shadow: 0 8px 20px var(--glow-color);
+            transform: translateX(5px);
+        }
+
+        .toggle-btn {
+            position: fixed;
+            top: 25px;
+            left: 320px;
+            z-index: 1001;
+            background: var(--secondary-color);
+            color: var(--primary-color);
+            border: none;
+            padding: 10px 15px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 16px;
+            transition: all 0.4s ease;
+            box-shadow: 0 5px 15px var(--glow-color);
+        }
+
+        .toggle-btn:hover {
+            background: #00ccff;
+            transform: rotate(90deg);
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 50px;
+            margin-left: 300px;
+            transition: margin-left 0.4s ease;
+            z-index: 1;
+        }
+
+        .main-content.expanded {
+            margin-left: 0;
+        }
+
+        .header {
+            background: var(--primary-color);
+            color: var(--secondary-color);
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 15px 40px var(--shadow-color);
+            border: 2px solid var(--secondary-color);
+        }
+
+        .header h1 {
+            margin: 0;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-shadow: 0 0 10px var(--glow-color);
+        }
+
+        .header .status {
+            font-size: 16px;
+            font-weight: 300;
+            background: rgba(0, 230, 255, 0.1);
+            padding: 5px 15px;
+            border-radius: 20px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 15px 40px var(--shadow-color);
+            border: 2px solid var(--border-color);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0, 230, 255, 0.05) 0%, transparent 70%);
+            animation: rotate 25s linear infinite;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 50px var(--shadow-color);
+            border-color: var(--secondary-color);
+        }
+
+        .card h2 {
+            color: var(--primary-color);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 25px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            text-shadow: 0 0 5px var(--glow-color);
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            padding: 18px;
+            background: #fff;
+            margin: 15px 0;
+            border-radius: 10px;
+            border-left: 6px solid var(--secondary-color);
+            font-size: 14px;
+            color: var(--text-color);
+            transition: all 0.4s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        li:hover {
+            background: #f5faff;
+            transform: translateX(5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 15px;
+            margin: 25px 0;
+        }
+
+        th, td {
+            padding: 18px;
+            text-align: left;
+        }
+
+        th {
+            background: var(--primary-color);
+            color: var(--secondary-color);
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            text-shadow: 0 0 5px var(--glow-color);
+        }
+
+        td {
+            background: #fff;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-color);
+            font-size: 14px;
+        }
+
+        tr:hover td {
+            background: #f5faff;
+        }
+
+        form {
+            display: flex;
+            gap: 20px;
+            padding: 25px;
+            background: #fff;
+            border-radius: 10px;
+            border: 2px solid var(--border-color);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        input[type="text"], input[type="number"] {
+            padding: 14px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            flex: 1;
+            font-size: 14px;
+            color: var(--text-color);
+            transition: all 0.4s ease;
+        }
+
+        input[type="text"]:focus, input[type="number"]:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 15px var(--glow-color);
+            outline: none;
+        }
+
+        button {
+            padding: 14px 30px;
+            background: var(--secondary-color);
+            color: var(--primary-color);
+            border: none;
+            border-radius: 8px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            box-shadow: 0 10px 25px var(--glow-color);
+        }
+
+        button:hover {
+            background: #00ccff;
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px var(--glow-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-overlay"></div>
+    <div class="sidebar" id="sidebar">
+        <h3>Cyber Threat Detector</h3>
+        <a href="{{ url_for('home') }}" class="active">Command Dashboard</a>
+        <a href="{{ url_for('show_firewall') }}">Firewall Protocols</a>
+        <a href="{{ url_for('show_incidents') }}">Incident Analysis</a>
+        <a href="{{ url_for('show_blockchain') }}">Blockchain Registry</a>
+        <a href="{{ url_for('logout') }}">Secure Logout</a>
+    </div>
+
+    <button class="toggle-btn" id="toggleBtn" onclick="toggleSidebar()">☰</button>
+
+    <div class="main-content" id="mainContent">
+        <div class="header">
+            <h1>Welcome, {{ role|default('Command Officer') }}!</h1>
+            <span class="status">Threat Level: <span id="threatLevel">Stable</span></span>
+        </div>
+
+        <div class="card">
+            <h2>Threat Intelligence</h2>
+            <ul>
+                {% for threat in threats if "Insider Threat" not in threat and "Third-Party Risk" not in threat %}
+                    <li>{{ threat }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="card">
+            <h2>Insider Threat Analysis</h2>
+            <ul>
+                {% for threat in threats if "Insider Threat" in threat %}
+                    <li>{{ threat }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="card">
+            <h2>Third-Party Risk Assessment</h2>
+            <ul>
+                {% for threat in threats if "Third-Party Risk" in threat %}
+                    <li>{{ threat }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="card">
+            <h2>Network Visualization</h2>
+            <div>{{ graph|safe }}</div>
+        </div>
+
+        <div class="card">
+            <h2>Global Threat Matrix</h2>
+            <ul>
+                {% for threat in global_threats %}
+                    <li>{{ threat.threat }} (IP: {{ threat.ip }}, Severity: {{ threat.severity }})</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="card">
+            <h2>Access Monitoring</h2>
+            {% if login_counts %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>IP Address</th>
+                            <th>Login Count</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for entry in login_counts %}
+                            <tr>
+                                <td>{{ entry.source_ip if entry.source_ip else entry.ip }}</td>
+                                <td>{{ entry.action if entry.action else entry.count }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>No access data available.</p>
+            {% endif %}
+        </div>
+
+        <div class="card">
+            <h2>Response Operations</h2>
+            <ul>
+                {% for action in executed_actions %}
+                    <li>{{ action }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="card">
+            <h2>Intelligence Submission</h2>
+            <form method="POST" action="{{ url_for('submit_threat') }}">
+                <label for="ip">Target IP:</label>
+                <input type="text" id="ip" name="ip" required placeholder="e.g., 192.168.1.1">
+                <label for="score">Threat Index (0-100):</label>
+                <input type="number" id="score" name="score" min="0" max="100" required placeholder="0-100">
+                <button type="submit">Submit Intelligence</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('mainContent');
+            const toggleBtn = document.getElementById('toggleBtn');
+            sidebar.classList.toggle('collapsed');
+            mainContent.classList.toggle('expanded');
+            toggleBtn.textContent = sidebar.classList.contains('collapsed') ? '☰' : '✕';
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Real-time threat level update
+            setInterval(() => {
+                fetch('/realtime_data')
+                    .then(response => response.json())
+                    .then(data => {
+                        const threatCount = data.threats.length;
+                        const threatLevel = threatCount > 5 ? 'Critical' : threatCount > 2 ? 'Elevated' : 'Stable';
+                        document.getElementById('threatLevel').textContent = threatLevel;
+                    })
+                    .catch(err => console.error('Error fetching real-time data:', err));
+            }, 5000);
+        });
+    </script>
+</body>
+</html>
